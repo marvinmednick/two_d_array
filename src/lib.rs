@@ -1,26 +1,25 @@
 #![feature(test)]
-use std::fmt::format;
 use std::slice::Chunks;
 
 
 #[derive(Debug)]
-pub struct FlattendArray<T> {
+pub struct TwoDArray<T> {
     array : Vec::<Option<T>>,
     width: usize,
     height: usize
 
 }
 
-impl<T:std::fmt::Debug+Clone+std::fmt::Display> FlattendArray<T> {
+impl<T:std::fmt::Debug+Clone+std::fmt::Display> TwoDArray<T> {
 
-    pub fn new(width: usize, height: usize) -> FlattendArray<T> {
+    pub fn new(width: usize, height: usize) -> TwoDArray<T> {
         let mut array = Vec::<Option<T>>::new();
         let total_size = width * height;
-        for index in 0..total_size  {
+        for _index in 0..total_size  {
             array.push(None);
         }
 
-        FlattendArray { array: array, width: width, height: height }
+        TwoDArray { array: array, width: width, height: height }
     }
 
     pub fn get(&self,x: usize, y: usize) -> Option<T> {
@@ -66,18 +65,32 @@ impl<T:std::fmt::Debug+Clone+std::fmt::Display> FlattendArray<T> {
         }
     }
 
+    pub fn log_display(&self) {
+
+        let header : String = (0..self.width).map(|val| format!("{:2} ",val)).collect();
+        println!("{:10} {}","Col",header);
+        for row in 0..self.height {
+            let mut row_data = Vec::new();
+            for col in 0..self.width {
+                row_data.push(format!("{:2} ",self.get_string(col,row)));
+            }
+            let row_format : String = row_data.join("");
+            println!("Row {:2} :    {}", row,row_format);
+        }
+
+    }
 }
 
 
 #[cfg(test)]
 mod array_test {
 
-    use crate::FlattendArray;
+    use crate::TwoDArray;
 
     #[test]
     fn flattend_array_basic() {
         let size = 8; 
-        let mut data : FlattendArray<u32> = FlattendArray::new(size, size);
+        let mut data : TwoDArray<u32> = TwoDArray::new(size, size);
 
 
         data.set(1,2,12);

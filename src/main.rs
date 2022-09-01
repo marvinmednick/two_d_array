@@ -1,4 +1,4 @@
-use two_d_array::{FlattendArray};
+use two_d_array::{TwoDArray};
 
 fn main() { 
     let vertexes = 7;
@@ -6,7 +6,7 @@ fn main() {
 
 
     println!("\n--------- Flattened Array ------- \n");
-    let mut data : FlattendArray<u32> = FlattendArray::new(vertexes, iterations);
+    let mut data : TwoDArray<u32> = TwoDArray::new(vertexes, iterations);
 
     data.set(3,0,44);
    
@@ -22,6 +22,8 @@ fn main() {
         println!("Iteration {:2} :    {}", row,row_format);
     }
 
+    println!("Via function call");
+    data.log_display();
     println!("Iter 0,Vertex 3 -> {}", data.get_string(3,0));
     println!("Iter 1,Vertex 3 -> {}", data.get_string(3,1));
 
@@ -33,7 +35,7 @@ fn main() {
     for row in data.get_row_iter() {
         let row_format : String = row.iter().map(|val| { 
             match val {
-                Some(x) => format!("{:>2} ",val.unwrap()),
+                Some(x) => format!("{:>2} ",x),
                 None    => format!("{:>2} ","N"),
             }}).collect();
         println!("Iteration {:2} :    {}", count,row_format);

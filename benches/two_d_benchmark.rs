@@ -1,10 +1,10 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId, Throughput};
 use std::time::Duration;
-use two_d_array::{FlattendArray};
+use two_d_array::{TwoDArray};
 
 pub fn flat_array_init(val: u32) -> u32 {
     let size = 2000;
-    let mut data : FlattendArray<u32> = FlattendArray::new(size,size);
+    let mut data : TwoDArray<u32> = TwoDArray::new(size,size);
     data.set(black_box(3),black_box(0),black_box(val));
     black_box(data.get(black_box(3),black_box(0)).unwrap())
 }
@@ -18,7 +18,7 @@ fn flat_array_loop_benchmark(c: &mut Criterion) {
         group.throughput(Throughput::Bytes(*size as u64));
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
             b.iter(|| {
-                let mut data : FlattendArray<u32> = FlattendArray::new(size,size);
+                let mut data : TwoDArray<u32> = TwoDArray::new(size,size);
                 data.set(black_box(3),black_box(0),black_box(size as u32));
                 sum += black_box(data.get(black_box(3),black_box(0)).unwrap());
 

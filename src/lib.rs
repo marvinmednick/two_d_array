@@ -1,9 +1,10 @@
 use std::slice::Chunks;
+use log::{error};
 
 
 #[derive(Debug)]
 pub struct TwoDArray<T> {
-    array : Vec::<Option<T>>,
+    array : Vec::<T>,
     width: usize,
     height: usize
 
@@ -11,41 +12,28 @@ pub struct TwoDArray<T> {
 
 impl<T:std::fmt::Debug+Clone+std::fmt::Display> TwoDArray<T> {
 
-    pub fn new(width: usize, height: usize) -> TwoDArray<T> {
-        let mut array = Vec::<Option<T>>::new();
+    pub fn new(width: usize, height: usize, initial_value: T) -> TwoDArray<T> {
+        let mut array = Vec::<T>::new();
         let total_size = width * height;
         for _index in 0..total_size  {
-            array.push(None);
+            array.push(initial_value.clone());
         }
 
         TwoDArray { array: array, width: width, height: height }
     }
 
-    pub fn get(&self,x: usize, y: usize) -> Option<T> {
+    pub fn get(&self,x: usize, y: usize) -> Result<T,String> {
         if x < self.width && y < self.height {
             let index = y * self.width + x;
-            self.array[index].clone()
+            Ok(self.array[index].clone())
         }
         else {
-            None
+            error!("Invalid Index x {} (max {}) y {} (max {})",x,y,self.width,self.height);
+            Err("Invalid Index".to_string())
         }
     }
 
-    pub fn get_string(&self,x: usize, y: usize) ->  String{
-        if x < self.width && y < self.height {
-            let index = y * self.width + x;
-            match &self.array[index] {
-                Some(val) => format!("{}",val),
-                None =>   format!("{}","N"),
-            }
-        }
-        else {
-                format!("{}","N")
-        }
-    }
-
-
-    pub fn get_row_iter(&self) -> Chunks<'_, Option<T>> {
+    pub fn get_row_iter(&self) -> Chunks<'_, T> {
         self.array.chunks(self.width)
     }
 
@@ -53,31 +41,10 @@ impl<T:std::fmt::Debug+Clone+std::fmt::Display> TwoDArray<T> {
     pub fn set(&mut self, x : usize, y : usize , value : T)  {
         if x < self.width && y < self.height {
             let index = y * self.width + x;
-            self.array[index] = Some(value);
+            self.array[index] = value;
         }
     }
 
-    pub fn unset(&mut self, x : usize, y : usize )  {
-        if x < self.width && y < self.height {
-            let index = y * self.width + x;
-            self.array[index] = None;
-        }
-    }
-
-    pub fn log_display(&self) {
-
-        let header : String = (0..self.width).map(|val| format!("{:2} ",val)).collect();
-        println!("{:10} {}","Col",header);
-        for row in 0..self.height {
-            let mut row_data = Vec::new();
-            for col in 0..self.width {
-                row_data.push(format!("{:2} ",self.get_string(col,row)));
-            }
-            let row_format : String = row_data.join("");
-            println!("Row {:2} :    {}", row,row_format);
-        }
-
-    }
 }
 
 
@@ -89,7 +56,7 @@ mod array_test {
     #[test]
     fn flattend_array_basic() {
         let size = 8; 
-        let mut data : TwoDArray<u32> = TwoDArray::new(size, size);
+        let mut data : TwoDArray<u32> = TwoDArray::new(size, size,u32::MAX);
 
 
         data.set(1,2,12);
@@ -98,13 +65,13 @@ mod array_test {
         data.set(6,7,67);
         data.set(8,8,88);
         for i in 0..size {
-            assert_eq!(data.get(i,i), None)
+            assert_eq!(data.get(i,i), Ok(u32::MAX));
         }
-        assert_eq!(data.get(1,2),Some(12));
-        assert_eq!(data.get(2,3),Some(23));
-        assert_eq!(data.get(3,4),Some(34));
-        assert_eq!(data.get(6,7),Some(67));
-        assert_eq!(data.get(8,8),None);
+        assert_eq!(data.get(1,2),Ok(12));
+        assert_eq!(data.get(2,3),Ok(23));
+        assert_eq!(data.get(3,4),Ok(34));
+        assert_eq!(data.get(6,7),Ok(67));
+        assert_eq!(data.get(8,8),Err("Invalid Index".to_string()));
     }
 
 }

@@ -37,6 +37,17 @@ impl<T:std::fmt::Debug+Clone+std::fmt::Display> TwoDArray<T> {
         self.array.chunks(self.width)
     }
 
+    pub fn get_row(&self,row: usize) -> &[T] {
+        if row < self.height {
+            let start_index = row * self.width;
+            let end_index = start_index + self.width;
+            &self.array[start_index..end_index]
+        }
+        else {
+            &[]
+        }
+    }
+
 
     pub fn set(&mut self, x : usize, y : usize , value : T)  {
         if x < self.width && y < self.height {
@@ -72,6 +83,19 @@ mod array_test {
         assert_eq!(data.get(3,4),Ok(34));
         assert_eq!(data.get(6,7),Ok(67));
         assert_eq!(data.get(8,8),Err("Invalid Index".to_string()));
+    }
+
+    #[test]
+    fn get_row_test() {
+        let size = 8; 
+        let mut data : TwoDArray<u32> = TwoDArray::new(size, size,u32::MAX);
+        data.set(1,2,12);
+        data.set(2,3,23);
+        data.set(3,4,34);
+        data.set(6,7,67);
+        let row = data.get_row(3);
+        assert_eq!(row[2],23);
+    
     }
 
 }
